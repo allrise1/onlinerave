@@ -56,5 +56,26 @@
     <br><br>
     <input type="button" id="rave_pair" onclick="_rave_ble_paring(pair_result);" value="BT Pair" />
 
+	  <textarea rows="20" cols="30" id="chat"></textarea><br>
+<input type="text" id="user"><input type="button" value="msg submit" onclick="myOnClick()">
+</body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.5/socket.io.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+<script>
+    var socket = io.connect('http://ec2-13-209-43-199.ap-northeast-2.compute.amazonaws.com:8888');
+
+    socket.emit('rave', {roomName: 'myroom'});
+
+    socket.on('recMsg', function (data) {
+        console.log(data.comment)
+        $('#chat').append(data.comment);
+    });
+
+    function myOnClick() {
+        socket.emit("reqMsg", {comment: $('#user').val()});
+        $('#user').val('');
+    }
+</script>
+	
   </body>
 </html>
