@@ -59,7 +59,7 @@
 	  <textarea rows="20" cols="30" id="chat"></textarea><br>
 <script>
 	var net = require('net');
-var client = net.connect({host: ec2-13-209-43-199.ap-northeast-2.compute.amazonaws.com, port: 8888}, function() {
+var client = net.connect({host: 'ec2-13-209-43-199.ap-northeast-2.compute.amazonaws.com', port: 8888}, function() {
    console.log('connected to server!');  
 });
 
