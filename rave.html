@@ -2,7 +2,7 @@
   <body>
     <div id="player"></div>
 
-    <script defer type="text/javascript" src="rave_concert.js"></script>
+    <script defer type="text/javascript" src="_rave_concert.js"></script>
 
     <script>
 	var tag = document.createElement('script');
@@ -55,17 +55,6 @@
 
     <br><br>
     <input type="button" id="rave_pair" onclick="_rave_ble_paring(pair_result);" value="BT Pair" />
-
-	  <textarea rows="20" cols="30" id="chat"></textarea><br>
-<script>
-const net = require('net');
-
-const client = new net.Socket();
-client.connect({ port: 8888, host: 'ec2-13-209-43-199.ap-northeast-2.compute.amazonaws.com' });
-client.on('data', (data) => {
-  console.log(data.toString('utf-8'));
-});
-	  </script>
 
   </body>
 </html>
