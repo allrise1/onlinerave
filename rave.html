@@ -58,19 +58,32 @@
 
 	  <textarea rows="20" cols="30" id="chat"></textarea><br>
 <script>
-	var net = require('net');
-var client = net.connect({host: 'ec2-13-209-43-199.ap-northeast-2.compute.amazonaws.com', port: 8888}, function() {
-   console.log('connected to server!');  
-});
+    var host = 'ec2-13-209-43-199.ap-northeast-2.compute.amazonaws.com'; 
+    // Port we are connecting on
+    var port = 8888;
 
-client.on('data', function(data) {
-   console.log(data.toString());
-   client.end();
-});
+    var socket = new jSocket();
 
-client.on('end', function() { 
-   console.log('disconnected from server');
-});
+    // When the socket is added the to document 
+    socket.onReady = function(){
+            socket.connect(host, port);             
+    }
+
+    // Connection attempt finished
+    socket.onConnect = function(success, msg){
+            if(success){
+                    // Send something to the socket
+                    socket.write('Hello world');            
+            }else{
+                    alert('Connection to the server could not be estabilished: ' + msg);            
+            }       
+    }
+    socket.onData = function(data){
+            console.log('Received from socket: '+data);   
+    }
+
+    // Setup our socket in the div with the id="socket"
+    socket.setup('mySocket'); 
 	  </script>
 
   </body>
