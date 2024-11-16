@@ -1,120 +1,43 @@
-<html>
-  <body>
-    <div id="player"></div>
-
-    <script defer type="text/javascript" src="https://allrise.gitlab.io/rave_concert.js"></script>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NFC Writer Example</title>
+</head>
+<body>
+    <h1>Write NFC Data</h1>
+    <label for="data">Enter 16 bytes (max):</label>
+    <input type="text" id="data" maxlength="16" placeholder="Enter 16 bytes">
+    <button id="writeButton">Write to NFC</button>
+    <p id="status"></p>
 
     <script>
-	var tag = document.createElement('script');
+        const writeButton = document.getElementById('writeButton');
+        const status = document.getElementById('status');
 
-	tag.src = "https://www.youtube.com/iframe_api";
-	var firstScriptTag = document.getElementsByTagName('script')[0];
-	firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        writeButton.addEventListener('click', async () => {
+            const inputData = document.getElementById('data').value;
 
-	var player;
-	function tmDisplay() {
-		var tm = _rave_payer.getDuration();
-		//var tm = _rave_payer.getCurrentTime();
-		console.log(tm);
-	}
-	
-	function pair_result(error)
-	{
-		console.log(error.code+':'+error);
-	}
-	
-    function onYouTubeIframeAPIReady() {
-        player = new YT.Player('player', {
-          height: '360',
-          width: '640',
-          videoId: 'D-Wc2cEOaQQ',
-          events: {
-            'onReady': onPlayerReady,
-            'onStateChange': onPlayerStateChange
-          }
+            if (inputData.length > 16) {
+                status.textContent = "Error: Input exceeds 16 bytes!";
+                return;
+            }
+
+            try {
+                // Check for NFC API support
+                if (!('NDEFWriter' in window)) {
+                    status.textContent = "Web NFC is not supported on this device.";
+                    return;
+                }
+
+                const ndef = new NDEFWriter();
+                await ndef.write(inputData);
+                status.textContent = "Data written successfully!";
+            } catch (error) {
+                console.error(error);
+                status.textContent = `Error writing to NFC: ${error.message}`;
+            }
         });
-        _rave_youtube_player(player);
-		//setInterval(tmDisplay, 1000);
-      }
-
-      function onPlayerReady(event) {
-        event.target.playVideo();
-      }
-
-      var done = true;
-      function onPlayerStateChange(event) {
-        if (event.data == YT.PlayerState.PLAYING && !done) {
-          setTimeout(stopVideo, 6000);
-          done = true;
-        }
-      }
-      function stopVideo() {
-        player.stopVideo();
-      }
     </script>
-
-	  <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
- <script>
-  var ws;
-
-
-  $( document ).ready( function()
-  {
-   var txtRecv = $('#Recv');
-
-   //ws = new WebSocket("ws://54.249.245.7:8888");
-   ws = new WebSocket("ws://ec2-13-209-43-199.ap-northeast-2.compute.amazonaws.com:8888");
-
-
-
-
-   // websocket 서버에 연결되면 연결 메시지를 화면에 출력한다.
-   ws.onopen = function(e){
-    txtRecv.append( "connected to 8888<br>" );
-   };
-
-
-
-
-   // websocket 에서 수신한 메시지를 화면에 출력한다.
-   ws.onmessage = function(e){
-    txtRecv.append( e.data + "<br>" );
-   };
-
-
-
-
-   // websocket 세션이 종료되면 화면에 출력한다.
-   ws.onclose = function(e){
-    txtRecv.append( "closed<br>" );
-   }
-  } );
-
-
-
-
-  // 사용자가 입력한 메시지를 서버로 전송한다.
-  function sendMessage()
-  {
-   var txtSend = $('#Send');
-
-   ws.send( txtSend.val() );
-   txtSend.val( "" );
-  }
-
-
- </script>
-
-    <br><br>
-    <input type="button" id="rave_pair" onclick="_rave_ble_paring(pair_result);" value="BT Pair" />
-<form>
-  <input id="Send" type="text">
-  <button type="button" onclick="sendMessage();">Send</button>
- </form>
-
- <div id="Recv">
-
- </div>
-
-  </body>
+</body>
 </html>
