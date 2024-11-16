@@ -1,41 +1,31 @@
-<html lang="en">
+<!DOCTYPE html>
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NFC Writer Example</title>
+    <title>NFC Write Example</title>
 </head>
 <body>
-    <h1>Write NFC Data</h1>
-    <label for="data">Enter 16 bytes (max):</label>
-    <input type="text" id="data" maxlength="16" placeholder="Enter 16 bytes">
-    <button id="writeButton">Write to NFC</button>
+    <h1>NFC 16바이트 데이터 쓰기</h1>
+    <input type="text" id="dataInput" maxlength="16" placeholder="16바이트 입력" />
+    <button id="writeButton">NFC에 쓰기</button>
     <p id="status"></p>
 
     <script>
-        const writeButton = document.getElementById('writeButton');
-        const status = document.getElementById('status');
+        document.getElementById('writeButton').addEventListener('click', async () => {
+            const dataInput = document.getElementById('dataInput').value;
 
-        writeButton.addEventListener('click', async () => {
-            const inputData = document.getElementById('data').value;
-
-            if (inputData.length > 16) {
-                status.textContent = "Error: Input exceeds 16 bytes!";
+            if (dataInput.length !== 16) {
+                document.getElementById('status').innerText = '16바이트의 데이터를 입력하세요.';
                 return;
             }
 
             try {
-                // Check for NFC API support
-                if (!('NDEFWriter' in window)) {
-                    status.textContent = "Web NFC is not supported on this device.";
-                    return;
-                }
-
-                const ndef = new NDEFWriter();
-                await ndef.write(inputData);
-                status.textContent = "Data written successfully!";
+                const ndef = new NDEFReader();
+                await ndef.write({ records: [{ recordType: "text", data: dataInput }] });
+                document.getElementById('status').innerText = 'NFC 태그에 데이터가 성공적으로 쓰여졌습니다!';
             } catch (error) {
-                console.error(error);
-                status.textContent = `Error writing to NFC: ${error.message}`;
+                document.getElementById('status').innerText = '오류 발생: ' + error;
             }
         });
     </script>
