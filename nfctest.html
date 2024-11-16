@@ -1,0 +1,43 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NFC Writer Example</title>
+</head>
+<body>
+    <h1>Write NFC Data</h1>
+    <label for="data">Enter 16 bytes (max):</label>
+    <input type="text" id="data" maxlength="16" placeholder="Enter 16 bytes">
+    <button id="writeButton">Write to NFC</button>
+    <p id="status"></p>
+
+    <script>
+        const writeButton = document.getElementById('writeButton');
+        const status = document.getElementById('status');
+
+        writeButton.addEventListener('click', async () => {
+            const inputData = document.getElementById('data').value;
+
+            if (inputData.length > 16) {
+                status.textContent = "Error: Input exceeds 16 bytes!";
+                return;
+            }
+
+            try {
+                // Check for NFC API support
+                if (!('NDEFWriter' in window)) {
+                    status.textContent = "Web NFC is not supported on this device.";
+                    return;
+                }
+
+                const ndef = new NDEFWriter();
+                await ndef.write(inputData);
+                status.textContent = "Data written successfully!";
+            } catch (error) {
+                console.error(error);
+                status.textContent = `Error writing to NFC: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+</html>
