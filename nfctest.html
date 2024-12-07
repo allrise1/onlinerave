@@ -29,6 +29,9 @@
             }
           ]
         });
+
+        await ndef.scan();
+        
         alert('NFC 태그에 데이터 쓰기가 완료되었습니다.');
       } catch (error) {
         console.error('NFC 태그 쓰기 중 오류:', error);
