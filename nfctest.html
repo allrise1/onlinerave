@@ -27,11 +27,11 @@
         const dataToWrite = getBinaryDataFromInputs();
         if (!dataToWrite) return;
 
-        const ndefWriter = new NDEFWriter();
+        //const ndefWriter = new NDEFWriter();
         const ndefReader = new NDEFReader();
 
         // NFC 태그에 데이터 쓰기
-        await ndefWriter.write({
+        await ndefReader.write({
           records: [
             {
               recordType: "mime",
@@ -42,6 +42,11 @@
         });
         //alert("NFC 태그에 데이터 쓰기 성공: " + dataToWrite.toString());
 
+        var delayInMilliseconds = 100; 
+
+        setTimeout(function() {
+        }, delayInMilliseconds);
+        
         // NFC 태그 읽기
         await ndefReader.scan();
 
