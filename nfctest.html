@@ -5,7 +5,7 @@
   <title>NFC Tag Writer</title>
   <script>
     // 0~255의 바이너리 데이터를 생성하는 함수
-    function generateMimeData() {
+    function generateBinaryData() {
       // 임의의 바이너리 데이터 생성 (0~255)
       const data = new Uint8Array(256);
       for (let i = 0; i < 256; i++) {
@@ -18,14 +18,14 @@
     async function writeToNfcTag() {
       try {
         const ndef = new NDEFReader();
-        const mimeData = generateMimeData();
+        const binaryData = generateBinaryData();
 
         await ndef.write({
           records: [
             {
               recordType: "mime", // MIME 타입 설정
-              mediaType: "application/custom-type", // 사용자 정의 MIME 타입
-              data: mimeData // 바이너리 데이터
+              mediaType: "application/x-custom-binary", // 사용자 정의 MIME 타입
+              data: binaryData // 바이너리 데이터
             }
           ]
         });
