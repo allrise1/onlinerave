@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>NFC Write &Verification</title>
+  <title>NFC Write & Verification</title>
   <script>
     // 입력받은 값을 기반으로 4바이트 바이너리 데이터를 생성하는 함수
     function getBinaryDataFromInputs() {
@@ -27,10 +27,11 @@
         const dataToWrite = getBinaryDataFromInputs();
         if (!dataToWrite) return;
 
+        const ndefWriter = new NDEFWriter();
         const ndefReader = new NDEFReader();
 
         // NFC 태그에 데이터 쓰기
-        await ndefReader.write({
+        await ndefWriter.write({
           records: [
             {
               recordType: "mime",
