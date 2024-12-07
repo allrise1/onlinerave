@@ -5,7 +5,8 @@
   <title>NFC Tag Writer</title>
   <script>
     // 0~255의 바이너리 데이터를 생성하는 함수
-    function generateBinaryData() {
+    function generateMimeData() {
+      // 임의의 바이너리 데이터 생성 (0~255)
       const data = new Uint8Array(256);
       for (let i = 0; i < 256; i++) {
         data[i] = i;
@@ -17,9 +18,17 @@
     async function writeToNfcTag() {
       try {
         const ndef = new NDEFReader();
+        const mimeData = generateMimeData();
 
-        // NFC 태그 스캔 시작
-        await ndef.write(generateBinaryData());
+        await ndef.write({
+          records: [
+            {
+              recordType: "mime", // MIME 타입 설정
+              mediaType: "application/custom-type", // 사용자 정의 MIME 타입
+              data: mimeData // 바이너리 데이터
+            }
+          ]
+        });
         alert('NFC 태그에 데이터 쓰기가 완료되었습니다.');
       } catch (error) {
         console.error('NFC 태그 쓰기 중 오류:', error);
