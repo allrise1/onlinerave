@@ -34,7 +34,7 @@
         await ndefReader.write({
           records: [
             {
-              recordType: "unkown", // Binary 데이터를 저장하기 위한 타입
+              recordType: "unknown", // Binary 데이터를 저장하기 위한 타입
               data: dataToWrite.buffer,
             },
           ],
@@ -52,7 +52,7 @@
         ndefReader.onreading = (event) => {
           const records = event.message.records;
           for (const record of records) {
-            if (record.recordType === "unkown") {
+            if (record.recordType === "unknown") {
               const readData = new Uint8Array(record.data);
 
               // 데이터 비교
