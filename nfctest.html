@@ -23,8 +23,9 @@
         await ndef.write({
           records: [
             {
-              recordType: "unknown"
-              data: binaryData.buffer // 바이너리 데이터
+              recordType: "mime",
+              mediaType: "application/unknown", // MIME 유형 정의
+              data: binaryData.buffer, // ArrayBuffer 데이터 전달
             }
           ]
         });
