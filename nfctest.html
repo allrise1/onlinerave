@@ -16,7 +16,7 @@
     // NFC 태그에 데이터를 쓰는 함수
     async function writeToNfcTag() {
       try {
-        const ndef = new NDEFWriter();
+        const ndef = new NDEFReader();
 
         // NFC 태그 스캔 시작
         await ndef.write(generateBinaryData());
