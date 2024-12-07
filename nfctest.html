@@ -2,47 +2,98 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>NFC Tag Writer</title>
+  <title>NFC Write & Read Verification</title>
   <script>
-    // 0~255의 바이너리 데이터를 생성하는 함수
-    function generateBinaryData() {
-      // 임의의 바이너리 데이터 생성 (0~255)
-      const data = new Uint8Array(256);
-      for (let i = 0; i < 256; i++) {
-        data[i] = i;
+    // 입력받은 값을 기반으로 4바이트 바이너리 데이터를 생성하는 함수
+    function getBinaryDataFromInputs() {
+      const inputs = document.querySelectorAll(".byte-input");
+      const data = new Uint8Array(4);
+
+      for (let i = 0; i < inputs.length; i++) {
+        const value = parseInt(inputs[i].value, 10);
+        if (isNaN(value) || value < 0 || value > 255) {
+          alert("0과 255 사이의 숫자를 입력하세요.");
+          return null;
+        }
+        data[i] = value;
       }
+
       return data;
     }
 
-    // NFC 태그에 데이터를 쓰는 함수
-    async function writeToNfcTag() {
+    // NFC 태그에 4바이트 데이터를 쓰고 즉시 읽어서 비교하는 함수
+    async function writeAndVerifyNfcTag() {
       try {
-        const ndef = new NDEFReader();
-        const binaryData = generateBinaryData();
+        if (!('NDEFWriter' in window && 'NDEFReader' in window)) {
+          alert('이 브라우저는 NFC를 지원하지 않습니다.');
+          return;
+        }
 
-        await ndef.write({
+        const dataToWrite = getBinaryDataFromInputs();
+        if (!dataToWrite) return;
+
+        const ndefReader = new NDEFReader();
+
+        // NFC 태그에 데이터 쓰기
+        await ndefReader.write({
           records: [
             {
               recordType: "mime",
-              mediaType: "application/unknown", // MIME 유형 정의
-              data: binaryData.buffer, // ArrayBuffer 데이터 전달
-            }
-          ]
+              mediaType: "application/unknown",
+              data: dataToWrite.buffer,
+            },
+          ],
         });
+        //alert("NFC 태그에 데이터 쓰기 성공: " + dataToWrite.toString());
 
-        await ndef.scan();
-        
-        alert('NFC 태그에 데이터 쓰기가 완료되었습니다.');
+        // NFC 태그 읽기
+        await ndefReader.scan();
+
+        ndefReader.onreading = (event) => {
+          const records = event.message.records;
+          for (const record of records) {
+            if (record.recordType === "mime" && record.mediaType === "application/unknown") {
+              const readData = new Uint8Array(record.data);
+
+              // 데이터 비교
+              if (readData.length === 4 && dataToWrite.toString() === readData.toString()) {
+                alert(
+                  "NFC 태그 쓰기 성공: " + readData.toString()
+                );
+              } else {
+                alert(
+                  "NFC 태그 쓰기를 다시 해 주세요:\n입력한 데이터: " +
+                    dataToWrite.toString() +
+                    "\n읽은 데이터: " +
+                    readData.toString()
+                );
+              }
+              return;
+            }
+          }
+
+          alert("지원하지 않는 데이터 유형입니다.");
+        };
+
+        ndefReader.onreadingerror = () => {
+          alert("NFC 태그 읽기 중 오류가 발생했습니다.");
+        };
       } catch (error) {
-        console.error('NFC 태그 쓰기 중 오류:', error);
-        alert('NFC 태그 쓰기 실패: ' + error.message);
+        console.error("NFC 처리 오류:", error);
+        alert("NFC 처리 실패: " + error.message);
       }
     }
   </script>
 </head>
 <body>
-  <h1>NFC Tag Writer</h1>
-  <p>아래 버튼을 눌러 NFC 태그에 0~255의 바이너리 데이터를 쓰세요.</p>
-  <button onclick="writeToNfcTag()">NFC 태그에 쓰기</button>
+  <h1>NFC Write & Read Verification</h1>
+  <p>0과 255 사이의 값을 4개 입력하세요.</p>
+  <div>
+    <label>Byte 1: <input type="number" class="byte-input" min="0" max="255"></label><br>
+    <label>Byte 2: <input type="number" class="byte-input" min="0" max="255"></label><br>
+    <label>Byte 3: <input type="number" class="byte-input" min="0" max="255"></label><br>
+    <label>Byte 4: <input type="number" class="byte-input" min="0" max="255"></label><br>
+  </div>
+  <button onclick="writeAndVerifyNfcTag()">NFC 태그에 쓰기 및 확인</button>
 </body>
 </html>
