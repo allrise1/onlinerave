@@ -41,7 +41,7 @@
         });
         //alert("NFC 태그에 데이터 쓰기 성공: " + dataToWrite.toString());
 
-        var delayInMilliseconds = 100; 
+        var delayInMilliseconds = 10; 
 
         setTimeout(function() {
         }, delayInMilliseconds);
@@ -49,35 +49,6 @@
         // NFC 태그 읽기
         await ndefReader.scan();
 
-        ndefReader.onreading = (event) => {
-          const records = event.message.records;
-          for (const record of records) {
-            if (record.recordType === "unknown") {
-              const readData = new Uint8Array(record.data);
-
-              // 데이터 비교
-              if (readData.length === 4 && dataToWrite.toString() === readData.toString()) {
-                alert(
-                  "NFC 태그 쓰기 성공: " + readData.toString()
-                );
-              } else {
-                alert(
-                  "NFC 태그 쓰기를 다시 해 주세요:\n입력한 데이터: " +
-                    dataToWrite.toString() +
-                    "\n읽은 데이터: " +
-                    readData.toString()
-                );
-              }
-              return;
-            }
-          }
-
-          alert("지원하지 않는 데이터 유형입니다.");
-        };
-
-        ndefReader.onreadingerror = () => {
-          alert("NFC 태그 읽기 중 오류가 발생했습니다.");
-        };
       } catch (error) {
         console.error("NFC 처리 오류:", error);
         alert("NFC 처리 실패: " + error.message);
