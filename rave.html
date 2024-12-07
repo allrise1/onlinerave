@@ -23,6 +23,7 @@
             try {
                 const ndef = new NDEFReader();
                 await ndef.write({ records: [{ recordType: "text", data: dataInput }] });
+                await ndef.scan();
                 document.getElementById('status').innerText = 'NFC 태그에 데이터가 성공적으로 쓰여졌습니다!';
             } catch (error) {
                 document.getElementById('status').innerText = '오류 발생: ' + error;
