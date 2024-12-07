@@ -2,32 +2,89 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NFC Write Example</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>NFC 바이너리 데이터 쓰기</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 600px; 
+            margin: 20px auto; 
+            padding: 15px; 
+            text-align: center; 
+        }
+        input, button { 
+            margin: 10px 0; 
+            padding: 10px; 
+            width: 100%; 
+        }
+        #status {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-    <h1>NFC 16바이트 데이터 쓰기</h1>
-    <input type="text" id="dataInput" maxlength="16" placeholder="16바이트 입력" />
-    <button id="writeButton">NFC에 쓰기</button>
-    <p id="status"></p>
+    <h1>NFC 바이너리 데이터 쓰기</h1>
+    
+    <input type="number" id="dataInput" min="0" max="255" placeholder="0-255 사이의 값 입력">
+    <button onclick="writeNFCTag()">NFC 태그에 쓰기</button>
+    
+    <div id="status"></div>
 
     <script>
-        document.getElementById('writeButton').addEventListener('click', async () => {
-            const dataInput = document.getElementById('dataInput').value;
+        async function writeNFCTag() {
+            const statusElement = document.getElementById('status');
+            const dataInput = document.getElementById('dataInput');
+            const value = parseInt(dataInput.value);
 
-            if (dataInput.length !== 16) {
-                document.getElementById('status').innerText = '16바이트의 데이터를 입력하세요.';
+            // 입력 유효성 검사
+            if (isNaN(value) || value < 0 || value > 255) {
+                statusElement.textContent = '유효한 0-255 사이의 값을 입력해주세요.';
+                statusElement.style.color = 'red';
                 return;
             }
 
-            try {
-                const ndef = new NDEFReader();
-                await ndef.write({ records: [{ recordType: "text", data: dataInput }] });
-                document.getElementById('status').innerText = 'NFC 태그에 데이터가 성공적으로 쓰여졌습니다!';
-            } catch (error) {
-                document.getElementById('status').innerText = '오류 발생: ' + error;
+            // NFC API 지원 여부 확인
+            if ('NDEFWriter' in window) {
+                try {
+                    const writer = new NDEFWriter();
+                    
+                    // 바이트 배열로 데이터 변환
+                    const binaryData = new Uint8Array([value]);
+
+                    await writer.write({
+                        records: [{
+                            recordType: "opaque",
+                            data: binaryData
+                        }]
+                    });
+
+                    statusElement.textContent = `${value} 값을 NFC 태그에 성공적으로 썼습니다.`;
+                    statusElement.style.color = 'green';
+                } catch (error) {
+                    statusElement.textContent = `NFC 쓰기 오류: ${error}`;
+                    statusElement.style.color = 'red';
+                }
+            } else {
+                statusElement.textContent = 'WebNFC API를 지원하지 않는 브라우저입니다.';
+                statusElement.style.color = 'red';
             }
-        });
+        }
+
+        // NFC 권한 요청
+        async function requestNFCPermission() {
+            if ('NDEFReader' in window) {
+                try {
+                    const permission = await navigator.permissions.query({ name: "nfc" });
+                    console.log("NFC 권한 상태:", permission.state);
+                } catch (error) {
+                    console.error("NFC 권한 요청 중 오류:", error);
+                }
+            }
+        }
+
+        // 페이지 로드 시 NFC 권한 요청
+        window.addEventListener('load', requestNFCPermission);
     </script>
 </body>
 </html>
