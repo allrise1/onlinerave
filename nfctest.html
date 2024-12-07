@@ -35,7 +35,7 @@
           records: [
             {
               recordType: "mime",
-              mediaType: "application/unknown",
+              mediaType: "application/octet-stream",
               data: dataToWrite.buffer,
             },
           ],
@@ -53,7 +53,7 @@
         ndefReader.onreading = (event) => {
           const records = event.message.records;
           for (const record of records) {
-            if (record.recordType === "mime" && record.mediaType === "application/unknown") {
+            if (record.recordType === "mime" && record.mediaType === "application/octet-stream") {
               const readData = new Uint8Array(record.data);
 
               // 데이터 비교
