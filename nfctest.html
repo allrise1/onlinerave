@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>NFC Write & Verification</title>
+  <title>NFC Write</title>
   <script>
     // 입력받은 값을 기반으로 4바이트 바이너리 데이터를 생성하는 함수
     function getBinaryDataFromInputs() {
@@ -57,13 +57,13 @@
   </script>
 </head>
 <body>
-  <h1>NFC Write & Read Verification</h1>
+  <h1>NFC Write</h1>
   <p>0과 255 사이의 값을 4개 입력하세요.</p>
   <div>
-    <label>RED  : <input type="number" class="byte-input" min="0" max="255"></label><br>
-    <label>GREEN: <input type="number" class="byte-input" min="0" max="255"></label><br>
-    <label>BLUE : <input type="number" class="byte-input" min="0" max="255"></label><br>
-    <label>WHITE: <input type="number" class="byte-input" min="0" max="255"></label><br>
+    <label>R : <input type="number" class="byte-input" min="0" max="255"></label><br>
+    <label>G : <input type="number" class="byte-input" min="0" max="255"></label><br>
+    <label>B : <input type="number" class="byte-input" min="0" max="255"></label><br>
+    <label>W : <input type="number" class="byte-input" min="0" max="255"></label><br>
   </div>
   <button onclick="writeAndVerifyNfcTag()">NFC 태그에 쓰기 및 확인</button>
 </body>
