@@ -1,90 +1,42 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>NFC 바이너리 데이터 쓰기</title>
-    <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            max-width: 600px; 
-            margin: 20px auto; 
-            padding: 15px; 
-            text-align: center; 
+  <meta charset="UTF-8">
+  <title>NFC Tag Writer</title>
+  <script>
+    // 0~255의 바이너리 데이터를 생성하는 함수
+    function generateBinaryData() {
+      const data = new Uint8Array(256);
+      for (let i = 0; i < 256; i++) {
+        data[i] = i;
+      }
+      return data;
+    }
+
+    // NFC 태그에 데이터를 쓰는 함수
+    async function writeToNfcTag() {
+      try {
+        // 웹 NFC를 지원하는지 확인
+        if (!('NDEFWriter' in window)) {
+          alert('이 브라우저는 NFC를 지원하지 않습니다.');
+          return;
         }
-        input, button { 
-            margin: 10px 0; 
-            padding: 10px; 
-            width: 100%; 
-        }
-        #status {
-            margin-top: 20px;
-            font-weight: bold;
-        }
-    </style>
+
+        const ndef = new NDEFWriter();
+
+        // NFC 태그 스캔 시작
+        await ndef.write(generateBinaryData());
+        alert('NFC 태그에 데이터 쓰기가 완료되었습니다.');
+      } catch (error) {
+        console.error('NFC 태그 쓰기 중 오류:', error);
+        alert('NFC 태그 쓰기 실패: ' + error.message);
+      }
+    }
+  </script>
 </head>
 <body>
-    <h1>NFC 바이너리 데이터 쓰기</h1>
-    
-    <input type="number" id="dataInput" min="0" max="255" placeholder="0-255 사이의 값 입력">
-    <button onclick="writeNFCTag()">NFC 태그에 쓰기</button>
-    
-    <div id="status"></div>
-
-    <script>
-        async function writeNFCTag() {
-            const statusElement = document.getElementById('status');
-            const dataInput = document.getElementById('dataInput');
-            const value = parseInt(dataInput.value);
-
-            // 입력 유효성 검사
-            if (isNaN(value) || value < 0 || value > 255) {
-                statusElement.textContent = '유효한 0-255 사이의 값을 입력해주세요.';
-                statusElement.style.color = 'red';
-                return;
-            }
-
-            // NFC API 지원 여부 확인
-            if ('NDEFWriter' in window) {
-                try {
-                    const writer = new NDEFWriter();
-                    
-                    // 바이트 배열로 데이터 변환
-                    const binaryData = new Uint8Array([value]);
-
-                    await writer.write({
-                        records: [{
-                            recordType: "opaque",
-                            data: binaryData
-                        }]
-                    });
-
-                    statusElement.textContent = `${value} 값을 NFC 태그에 성공적으로 썼습니다.`;
-                    statusElement.style.color = 'green';
-                } catch (error) {
-                    statusElement.textContent = `NFC 쓰기 오류: ${error}`;
-                    statusElement.style.color = 'red';
-                }
-            } else {
-                statusElement.textContent = 'WebNFC API를 지원하지 않는 브라우저입니다.';
-                statusElement.style.color = 'red';
-            }
-        }
-
-        // NFC 권한 요청
-        async function requestNFCPermission() {
-            if ('NDEFReader' in window) {
-                try {
-                    const permission = await navigator.permissions.query({ name: "nfc" });
-                    console.log("NFC 권한 상태:", permission.state);
-                } catch (error) {
-                    console.error("NFC 권한 요청 중 오류:", error);
-                }
-            }
-        }
-
-        // 페이지 로드 시 NFC 권한 요청
-        window.addEventListener('load', requestNFCPermission);
-    </script>
+  <h1>NFC Tag Writer</h1>
+  <p>아래 버튼을 눌러 NFC 태그에 0~255의 바이너리 데이터를 쓰세요.</p>
+  <button onclick="writeToNfcTag()">NFC 태그에 쓰기</button>
 </body>
 </html>
