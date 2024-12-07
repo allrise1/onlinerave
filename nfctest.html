@@ -24,11 +24,6 @@
     // NFC 태그에 4바이트 데이터를 쓰고 즉시 읽어서 비교하는 함수
     async function writeAndVerifyNfcTag() {
       try {
-        if (!('NDEFWriter' in window && 'NDEFReader' in window)) {
-          alert('이 브라우저는 NFC를 지원하지 않습니다.');
-          return;
-        }
-
         const dataToWrite = getBinaryDataFromInputs();
         if (!dataToWrite) return;
 
