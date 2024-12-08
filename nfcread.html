@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NFC Tag Debugger</title>
+  <title>NFC Raw Data Reader</title>
 </head>
 <body>
-  <h1>NFC Tag Reader</h1>
+  <h1>NFC Tag Debugger</h1>
   <button id="scanButton">Start NFC Scan</button>
   <p id="status">Status: Not started</p>
   <pre id="output">Log:</pre>
@@ -28,26 +28,30 @@
         await ndef.scan();
 
         ndef.onreading = event => {
-          const { message, serialNumber } = event;
+          const { serialNumber, message } = event;
           statusElement.textContent = `Status: Tag detected! Serial Number: ${serialNumber}`;
           outputElement.textContent = `Log:\nTag Serial Number: ${serialNumber}\n`;
 
-          if (message.records.length === 0) {
-            outputElement.textContent += "No NDEF records found.\n";
+          // Check for NDEF records
+          if (!message || message.records.length === 0) {
+            outputElement.textContent += "No NDEF records found.\nAttempting to decode raw data...\n";
             return;
           }
 
+          // Process NDEF Records
           for (const record of message.records) {
             const data = record.data ? new Uint8Array(record.data) : [];
-
-            // Hexadecimal representation of the raw data
             const hexData = Array.from(data, byte => byte.toString(16).padStart(2, "0")).join(" ");
             outputElement.textContent += `\nRecord Type: ${record.recordType}`;
             outputElement.textContent += `\nRaw Data (Hex): ${hexData}`;
             
-            // Decoding payload
-            const payloadText = new TextDecoder().decode(data);
-            outputElement.textContent += `\nPayload (Text): ${payloadText}\n`;
+            // Decode payload as text if possible
+            try {
+              const payloadText = new TextDecoder().decode(data);
+              outputElement.textContent += `\nPayload (Text): ${payloadText}`;
+            } catch (e) {
+              outputElement.textContent += "\nPayload could not be decoded as text.";
+            }
           }
         };
 
