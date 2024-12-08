@@ -49,12 +49,13 @@
         // NFC 태그 읽기
         await ndefReader.scan();
         ndefReader.addEventListener("reading", ({ message, serialNumber }) => {
-          for (const record of message.records) {
-            console.log("레코드 타입: ", record.recordType);
-            console.log("MIME 타입: ", record.mediaType);
-            console.log("데이터: ", decoder.decode(record.data));
-            document.getElementById('status').innerText = record.data.toString();
-          }
+            document.getElementById('status').innerText = message.record[0].data.toString();
+          //for (const record of message.records) {
+            //console.log("레코드 타입: ", record.recordType);
+            //console.log("MIME 타입: ", record.mediaType);
+            //console.log("데이터: ", decoder.decode(record.data));
+            //document.getElementById('status').innerText = record.data.toString();
+          //}
         });
         //document.getElementById('status').innerText = "쓰기 성공";
 
