@@ -48,7 +48,7 @@
         
         // NFC 태그 읽기
         await ndefReader.scan();
-        ndef.addEventListener("reading", ({ message, serialNumber }) => {
+        ndefReader.addEventListener("reading", ({ message, serialNumber }) => {
           for (const record of message.records) {
             console.log("레코드 타입: ", record.recordType);
             console.log("MIME 타입: ", record.mediaType);
