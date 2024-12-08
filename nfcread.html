@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NFC Tag Reader</title>
+</head>
+<body>
+  <h1>NFC Tag Reader</h1>
+  <button id="scanButton">Scan NFC Tag</button>
+  <p id="status">Status: Not started</p>
+  <pre id="output">Hex Data: </pre>
+
+  <script>
+    document.getElementById("scanButton").addEventListener("click", async () => {
+      const statusElement = document.getElementById("status");
+      const outputElement = document.getElementById("output");
+
+      if (!("NDEFReader" in window)) {
+        statusElement.textContent = "Status: Web NFC is not supported in this browser.";
+        return;
+      }
+
+      try {
+        const ndef = new NDEFReader();
+        statusElement.textContent = "Status: Scanning for NFC tag...";
+
+        await ndef.scan();
+
+        ndef.onreading = event => {
+          const { message } = event;
+          statusElement.textContent = "Status: Tag detected!";
+          outputElement.textContent = "Hex Data: ";
+
+          for (const record of message.records) {
+            if (record.recordType === "unknown") {
+              const data = record.data ? new Uint8Array(record.data) : [];
+              const hexData = Array.from(data, byte => byte.toString(16).padStart(2, "0")).join(" ");
+              outputElement.textContent += `\nRecord Type: ${record.recordType}\nHex Data: ${hexData}`;
+            } else {
+              outputElement.textContent += `\nRecord Type: ${record.recordType}\nData: (Not Unknown Type)`;
+            }
+          }
+        };
+
+        ndef.onreadingerror = () => {
+          statusElement.textContent = "Status: Failed to read NFC tag.";
+        };
+      } catch (error) {
+        statusElement.textContent = `Status: ${error.message}`;
+      }
+    });
+  </script>
+</body>
+</html>
