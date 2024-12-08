@@ -49,7 +49,8 @@
         // NFC 태그 읽기
         await ndefReader.scan();
         ndefReader.addEventListener("reading", ({ message, serialNumber }) => {
-            document.getElementById('status').innerText = message.record[0].data.toString();
+            document.getElementById('status').innerText = "쓰기";
+          //message.record[0].data.toString();
           //for (const record of message.records) {
             //console.log("레코드 타입: ", record.recordType);
             //console.log("MIME 타입: ", record.mediaType);
@@ -67,7 +68,7 @@
   </script>
 </head>
 <body>
-  <h1>NFC Write 1</h1>
+  <h1>NFC Write 2</h1>
   <p>0과 255 사이의 값을 4개 입력하세요.</p>
   <div>
     <label>R : <input type="number" class="byte-input" min="0" max="255"></label><br>
