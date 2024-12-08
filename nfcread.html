@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NFC Tag Reader</title>
+  <title>NFC Debug Reader</title>
 </head>
 <body>
-  <h1>NFC Tag Reader</h1>
-  <button id="scanButton">Scan NFC Tag</button>
+  <h1>NFC Tag Debugger</h1>
+  <button id="scanButton">Start NFC Scan</button>
   <p id="status">Status: Not started</p>
-  <pre id="output">Data Output: </pre>
+  <pre id="output">Log:</pre>
 
   <script>
     document.getElementById("scanButton").addEventListener("click", async () => {
@@ -28,34 +28,19 @@
         await ndef.scan();
 
         ndef.onreading = event => {
-          const { message } = event;
-          statusElement.textContent = "Status: Tag detected!";
-          outputElement.textContent = "Data Output:\n";
+          const { serialNumber, message } = event;
+          statusElement.textContent = `Status: Tag detected! Serial Number: ${serialNumber}`;
+          outputElement.textContent = `Log:\nTag Serial Number: ${serialNumber}\n`;
+
+          if (message.records.length === 0) {
+            outputElement.textContent += "No NDEF records found.\n";
+            return;
+          }
 
           for (const record of message.records) {
-            if (record.data) {
-              const data = new Uint8Array(record.data);
-
-              // Hexadecimal representation
-              const hexData = Array.from(data, byte => byte.toString(16).padStart(2, "0")).join(" ");
-              outputElement.textContent += `\nHex Data: ${hexData}`;
-
-              // ASCII representation
-              const asciiData = String.fromCharCode(...data);
-              outputElement.textContent += `\nASCII Data: ${asciiData}`;
-
-              // Decimal representation
-              const decimalData = Array.from(data, byte => byte.toString()).join(" ");
-              outputElement.textContent += `\nDecimal Data: ${decimalData}`;
-
-              // Interpret as 32-bit integer (big-endian)
-              if (data.length === 4) {
-                const intValue = (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];
-                outputElement.textContent += `\n32-bit Integer (Big Endian): ${intValue}`;
-              }
-            } else {
-              outputElement.textContent += "\nNo data in this record.";
-            }
+            const data = record.data ? new Uint8Array(record.data) : [];
+            outputElement.textContent += `\nRecord Type: ${record.recordType}`;
+            outputElement.textContent += `\nData: ${data.length > 0 ? data.join(", ") : "(Empty)"}`;
           }
         };
 
@@ -64,6 +49,7 @@
         };
       } catch (error) {
         statusElement.textContent = `Status: ${error.message}`;
+        outputElement.textContent += `\nError: ${error.stack}`;
       }
     });
   </script>
