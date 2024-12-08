@@ -53,9 +53,10 @@
             console.log("레코드 타입: ", record.recordType);
             console.log("MIME 타입: ", record.mediaType);
             console.log("데이터: ", decoder.decode(record.data));
+            document.getElementById('status').innerText = record.data.toString();
           }
         });
-        document.getElementById('status').innerText = "쓰기 성공";
+        //document.getElementById('status').innerText = "쓰기 성공";
 
       } catch (error) {
         console.error("NFC 처리 오류:", error);
