@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NFC Debug Reader</title>
+  <title>NFC Tag Debugger</title>
 </head>
 <body>
-  <h1>NFC Tag Debugger</h1>
+  <h1>NFC Tag Reader</h1>
   <button id="scanButton">Start NFC Scan</button>
   <p id="status">Status: Not started</p>
   <pre id="output">Log:</pre>
@@ -28,7 +28,7 @@
         await ndef.scan();
 
         ndef.onreading = event => {
-          const { serialNumber, message } = event;
+          const { message, serialNumber } = event;
           statusElement.textContent = `Status: Tag detected! Serial Number: ${serialNumber}`;
           outputElement.textContent = `Log:\nTag Serial Number: ${serialNumber}\n`;
 
@@ -39,8 +39,15 @@
 
           for (const record of message.records) {
             const data = record.data ? new Uint8Array(record.data) : [];
+
+            // Hexadecimal representation of the raw data
+            const hexData = Array.from(data, byte => byte.toString(16).padStart(2, "0")).join(" ");
             outputElement.textContent += `\nRecord Type: ${record.recordType}`;
-            outputElement.textContent += `\nData: ${data.length > 0 ? data.join(", ") : "(Empty)"}`;
+            outputElement.textContent += `\nRaw Data (Hex): ${hexData}`;
+            
+            // Decoding payload
+            const payloadText = new TextDecoder().decode(data);
+            outputElement.textContent += `\nPayload (Text): ${payloadText}\n`;
           }
         };
 
