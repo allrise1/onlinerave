@@ -26,7 +26,7 @@
 </head>
 <body>
     <h1>NFC Tag Reader</h1>
-    <button id="readNfcBtn">Read NFC Tag -</button>
+    <button id="readNfcBtn">Read NFC Tag</button>
     <div id="output">태그 데이터가 여기에 표시됩니다.</div>
 
     <script>
@@ -35,7 +35,7 @@
 
         readNfcBtn.addEventListener('click', async () => {
             // 기본 NFC 태그 값 (사용자가 입력한 hex 값)
-            const defaultHexData = '03 07 d5 00 04 00 32 00 00';
+            const defaultHexData = '00 00 00 00 00 00 00 00 00';
 
             // 브라우저가 Web NFC API를 지원하는지 확인
             if ('NDEFReader' in window) {
