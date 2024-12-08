@@ -49,8 +49,10 @@
         // NFC 태그 읽기
         await ndefReader.scan();
         ndefReader.addEventListener("reading", ({ message, serialNumber }) => {
-          const readData = new Uint8Array(message.records[0].data);
-          document.getElementById('status').innerText = readData.toString();
+          const hexString = Array.from(new Uint8Array(message.records[0].data.buffer))
+              .map(byte => byte.toString(16).padStart(2, '0'))
+              .join(' ');
+          document.getElementById('status').innerText = hexString;
           //for (const record of message.records) {
             //console.log("레코드 타입: ", record.recordType);
             //console.log("MIME 타입: ", record.mediaType);
