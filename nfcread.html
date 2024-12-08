@@ -9,7 +9,7 @@
   <h1>NFC Tag Reader</h1>
   <button id="scanButton">Scan NFC Tag</button>
   <p id="status">Status: Not started</p>
-  <pre id="output">Hex Data: </pre>
+  <pre id="output">Data Output: </pre>
 
   <script>
     document.getElementById("scanButton").addEventListener("click", async () => {
@@ -30,15 +30,31 @@
         ndef.onreading = event => {
           const { message } = event;
           statusElement.textContent = "Status: Tag detected!";
-          outputElement.textContent = "Hex Data: ";
+          outputElement.textContent = "Data Output:\n";
 
           for (const record of message.records) {
-            if (record.recordType === "unknown") {
-              const data = record.data ? new Uint8Array(record.data) : [];
+            if (record.data) {
+              const data = new Uint8Array(record.data);
+
+              // Hexadecimal representation
               const hexData = Array.from(data, byte => byte.toString(16).padStart(2, "0")).join(" ");
-              outputElement.textContent += `\nRecord Type: ${record.recordType}\nHex Data: ${hexData}`;
+              outputElement.textContent += `\nHex Data: ${hexData}`;
+
+              // ASCII representation
+              const asciiData = String.fromCharCode(...data);
+              outputElement.textContent += `\nASCII Data: ${asciiData}`;
+
+              // Decimal representation
+              const decimalData = Array.from(data, byte => byte.toString()).join(" ");
+              outputElement.textContent += `\nDecimal Data: ${decimalData}`;
+
+              // Interpret as 32-bit integer (big-endian)
+              if (data.length === 4) {
+                const intValue = (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];
+                outputElement.textContent += `\n32-bit Integer (Big Endian): ${intValue}`;
+              }
             } else {
-              outputElement.textContent += `\nRecord Type: ${record.recordType}\nData: (Not Unknown Type)`;
+              outputElement.textContent += "\nNo data in this record.";
             }
           }
         };
