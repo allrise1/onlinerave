@@ -40,7 +40,12 @@
           ],
         });
         //alert("NFC 태그에 데이터 쓰기 성공: " + dataToWrite.toString());
-        document.getElementById('status').innerText = "쓰기 성공";
+        const hexString = Array.from(new Uint8Array(dataToWrite.buffer))
+              .map(byte => byte.toString(16).padStart(2, '0'))
+              .join(' ');
+          document.getElementById('status').innerText = hexString;
+
+        //document.getElementById('status').innerText = "쓰기 성공";
 
       } catch (error) {
         console.error("NFC 처리 오류:", error);
