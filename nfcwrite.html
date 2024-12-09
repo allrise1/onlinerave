@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>NFC Write</title>
+  <script>
+    // 입력받은 값을 기반으로 4바이트 바이너리 데이터를 생성하는 함수
+    function getBinaryDataFromInputs() {
+      const inputs = document.querySelectorAll(".byte-input");
+      const data = new Uint8Array(4);
+
+      for (let i = 0; i < inputs.length; i++) {
+        const value = parseInt(inputs[i].value, 10);
+        if (isNaN(value) || value < 0 || value > 255) {
+          alert("0과 255 사이의 숫자를 입력하세요.");
+          return null;
+        }
+        data[i] = value;
+      }
+
+      return data;
+    }
+
+    // NFC 태그에 4바이트 데이터를 쓰고 즉시 읽어서 비교하는 함수
+    async function writeAndVerifyNfcTag() {
+      try {
+        const dataToWrite = getBinaryDataFromInputs();
+        if (!dataToWrite) return;
+
+        //const ndefWriter = new NDEFWriter();
+        const ndefReader = new NDEFReader();
+
+        // NFC 태그에 데이터 쓰기
+        await ndefReader.write({
+          records: [
+            {
+              recordType: "unknown", // Binary 데이터를 저장하기 위한 타입
+              data: dataToWrite.buffer,
+            },
+          ],
+        });
+        //alert("NFC 태그에 데이터 쓰기 성공: " + dataToWrite.toString());
+        document.getElementById('status').innerText = "쓰기 성공";
+
+      } catch (error) {
+        console.error("NFC 처리 오류:", error);
+        alert("NFC 처리 실패: " + error.message);
+      }
+    }
+  </script>
+</head>
+<body>
+  <h1>NFC Write</h1>
+  <p>0과 255 사이의 값을 4개 입력하세요.</p>
+  <div>
+    <label>R : <input type="number" class="byte-input" min="0" max="255"></label><br>
+    <label>G : <input type="number" class="byte-input" min="0" max="255"></label><br>
+    <label>B : <input type="number" class="byte-input" min="0" max="255"></label><br>
+    <label>W : <input type="number" class="byte-input" min="0" max="255"></label><br>
+    <p id="status"></p>
+  </div>
+  <button onclick="writeAndVerifyNfcTag()">NFC 태그에 쓰기 및 확인</button>
+</body>
+</html>
