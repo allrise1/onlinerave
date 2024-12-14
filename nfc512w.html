@@ -2,14 +2,15 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>NFC Write & Read</title>
+  <title>NFC Write</title>
   <script>
     // 0~255의 바이너리 데이터를 생성하는 함수
     function generateBinaryData() {
-      const data = new Uint8Array(137);
-      for (let i = 0; i < 137; i++) {
+      const data = new Uint8Array(256);
+      for (let i = 0; i < 256; i++) {
         data[i] = i;
       }
+      data[0] = 0x2B;
       return data;
     }
 
@@ -43,7 +44,7 @@
   </script>
 </head>
 <body>
-  <h1>NFC Write 137</h1>
+  <h1>NFC Write 256</h1>
   <p>NFC 태그에 데이터를 쓰고 읽을 수 있습니다.</p>
   <button onclick="writeToNfcTag()">NFC 태그에 쓰기</button>
 </body>
