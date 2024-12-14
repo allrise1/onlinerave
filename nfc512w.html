@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>NFC Write & Read</title>
+  <script>
+    // 0~255의 바이너리 데이터를 생성하는 함수
+    function generateBinaryData() {
+      const data = new Uint8Array(512);
+      for (let i = 0; i < 512; i++) {
+        data[i] = i;
+      }
+      return data;
+    }
+
+    // NFC 태그에 데이터를 쓰는 함수
+    async function writeToNfcTag() {
+      try {
+        if (!('NDEFReader' in window)) {
+          alert('이 브라우저는 NFC를 지원하지 않습니다.');
+          return;
+        }
+
+        const ndef = new NDEFReader();
+        const binaryData = generateBinaryData();
+
+        // unknown MIME 유형으로 데이터 쓰기
+        await ndef.write({
+          records: [
+            {
+              recordType: "unknown",
+              data: binaryData.buffer,
+            },
+          ],
+        });
+
+        alert('NFC 태그에 데이터 쓰기 성공');
+      } catch (error) {
+        console.error('NFC 쓰기 오류:', error);
+        alert('NFC 쓰기 실패: ' + error.message);
+      }
+    }
+  </script>
+</head>
+<body>
+  <h1>NFC Write 512</h1>
+  <p>NFC 태그에 데이터를 쓰고 읽을 수 있습니다.</p>
+  <button onclick="writeToNfcTag()">NFC 태그에 쓰기</button>
+</body>
+</html>
