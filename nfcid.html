@@ -162,16 +162,17 @@
         data[2] = 0x3E;
         resultDiv.textContent = 'NFC 태그에 데이터 쓰기 성공! 데이터를 읽는 중입니다...';
 
-       var delayInMilliseconds = 100; 
-
-        setTimeout(function() {
-        }, delayInMilliseconds);
-
         // NFC 태그 읽기
         await ndefReader.scan();
         ndefReader.addEventListener("reading", ({ serialNumber }) => {
         });
         isScanning = true;
+
+        var delayInMilliseconds = 1000; 
+
+        setTimeout(function() {
+        }, delayInMilliseconds);
+
 
         // NFC 읽기와 재시도 로직
         let isSuccess = false;
