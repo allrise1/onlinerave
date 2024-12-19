@@ -162,16 +162,19 @@
         data[2] = 0x3E;
         resultDiv.textContent = 'NFC 태그에 데이터 쓰기 성공! 데이터를 읽는 중입니다...';
 
+        await ndef.scan();
+        ndef.onreading = event => {
+          const { serialNumber } = event;
+        };
+        isScanning = true;
+
         // NFC 읽기와 재시도 로직
         let isSuccess = false;
         for (let attempt = 1; attempt <= 3; attempt++) {
           isSuccess = await startNFCScan(data);
           
           if (isSuccess) break;
-          if (attempt < 3) {
-            resultDiv.textContent = `읽기 실패, 1초 후 재시도 중 (${attempt}/3)...`;
-            await delay(1000); // 1초 지연 추가
-          }
+          if (attempt < 3) resultDiv.textContent = `읽기 실패, 1초 후 재시도 중 (${attempt}/3)...`;
         }
 
         if (isSuccess) {
