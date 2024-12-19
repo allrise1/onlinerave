@@ -64,7 +64,11 @@
       }
     });
 
-        // NFC 읽기 작업을 중지하는 함수
+    function delay(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // NFC 읽기 작업을 중지하는 함수
     async function stopNFCScan() {
       if (ndefReader && isScanning) {
         try {
@@ -102,11 +106,11 @@
               resolve(isMatch);
             };
 
-            // 5초 타임아웃 설정
+            // 타임아웃 설정
             timeoutId = setTimeout(() => {
               cleanup();
               resolve(false);
-            }, 1000);
+            }, 2000);
           })
           .catch(error => {
             cleanup();
@@ -164,7 +168,10 @@
           isSuccess = await startNFCScan(data);
           
           if (isSuccess) break;
-          if (attempt < 3) resultDiv.textContent = `읽기 실패, 재시도 중 (${attempt}/3)...`;
+          if (attempt < 3) {
+            resultDiv.textContent = `읽기 실패, 1초 후 재시도 중 (${attempt}/3)...`;
+            await delay(1000); // 1초 지연 추가
+          }
         }
 
         if (isSuccess) {
