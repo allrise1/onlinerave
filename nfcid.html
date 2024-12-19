@@ -105,21 +105,12 @@
         // NFC 읽기와 재시도 로직
         let isSuccess = false;
         for (let attempt = 1; attempt <= 3; attempt++) {
-          isSuccess = await new Promise((resolve, reject) => {
-            ndef.scan()
-              .then(() => {
-                ndef.onreading = event => {
-                  const readData = new Uint8Array(event.message.records[0].data.buffer);
-                  resolve(readData.every((byte, index) => byte === data[index]));
-                };
-              })
-              .catch(reject);
-          });
-  
-          if (isSuccess) break; // 읽기 성공 시 반복 종료
+          isSuccess = await startNFCScan(data);
+          
+          if (isSuccess) break;
           if (attempt < 3) resultDiv.textContent = `읽기 실패, 재시도 중 (${attempt}/3)...`;
         }
-  
+
         if (isSuccess) {
           resultDiv.textContent = '쓰기 및 읽기 성공! 데이터가 완전히 일치합니다.';
           if (id < 4294967295) idInput.value = id + 1;
@@ -128,6 +119,8 @@
         }
       } catch (err) {
         errorDiv.textContent = `오류 발생: ${err.message}`;
+      } finally {
+        await stopNFCScan();
       }
     });
   </script>
