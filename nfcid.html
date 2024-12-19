@@ -98,37 +98,31 @@
             },
           ],
         });
-        resultDiv.textContent = 'NFC 태그에 데이터 쓰기 성공! 데이터를 읽는 중입니다...';
+        
         data[2] = 0x3E;
-
         resultDiv.textContent = 'NFC 태그에 데이터 쓰기 성공! 데이터를 읽는 중입니다...';
 
-        // NFC 태그 읽기와 비교
+        // NFC 읽기와 재시도 로직
         let isSuccess = false;
         for (let attempt = 1; attempt <= 3; attempt++) {
-          await ndef.scan();
-          const readPromise = new Promise((resolve) => {
-            ndef.onreading = event => {
-              const readData = new Uint8Array(event.message.records[0].data);
-              let isEqual = true;
-              for (let i = 0; i < data.length; i++) {
-                if (data[i] !== readData[i]) {
-                  isEqual = false;
-                  break;
-                }
-              }
-              resolve(isEqual);
-            };
+          isSuccess = await new Promise((resolve, reject) => {
+            ndef.scan()
+              .then(() => {
+                ndef.onreading = event => {
+                  const readData = new Uint8Array(event.message.records[0].data.buffer);
+                  resolve(readData.every((byte, index) => byte === data[index]));
+                };
+              })
+              .catch(reject);
           });
-
-          isSuccess = await readPromise;
-          if (isSuccess) break;
+  
+          if (isSuccess) break; // 읽기 성공 시 반복 종료
           if (attempt < 3) resultDiv.textContent = `읽기 실패, 재시도 중 (${attempt}/3)...`;
         }
-
+  
         if (isSuccess) {
-          resultDiv.textContent = `쓰기 및 읽기 성공! 데이터가 완전히 일치합니다.`;
-          if (id < 4294967295) idInput.value = id + 1; // ID 값 자동 증가
+          resultDiv.textContent = '쓰기 및 읽기 성공! 데이터가 완전히 일치합니다.';
+          if (id < 4294967295) idInput.value = id + 1;
         } else {
           throw new Error('읽은 데이터가 쓰기 데이터와 일치하지 않습니다. (최대 3번 시도)');
         }
