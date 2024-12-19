@@ -26,7 +26,7 @@
   <label for="id">ID 입력 (4바이트 unsigned int):</label>
   <div class="id-control">
     <button id="decrement-id">-</button>
-    <input type="number" id="id" min="0" max="4294967295" required>
+    <input type="number" id="id" min="1" max="4294967295" required>
     <button id="increment-id">+</button>
   </div>
 
@@ -37,6 +37,12 @@
 
   <script>
     const idInput = document.getElementById('id');
+    const dateInput = document.getElementById('date');
+
+    const today = new Date();
+    const defaultYear = today.getFullYear();
+    const defaultMonth = String(today.getMonth() + 1).padStart(2, '0');
+    dateInput.value = `${defaultYear}-${defaultMonth}`;
 
     // ID 값 증가 및 감소 버튼 동작
     document.getElementById('increment-id').addEventListener('click', () => {
@@ -48,7 +54,7 @@
 
     document.getElementById('decrement-id').addEventListener('click', () => {
       const currentId = parseInt(idInput.value, 10) || 0;
-      if (currentId > 0) {
+      if (currentId > 1) {
         idInput.value = currentId - 1;
       }
     });
@@ -69,7 +75,8 @@
           throw new Error('모든 입력값을 올바르게 입력해주세요.');
         }
 
-        const [yy, mm] = date.split('-').map(Number);
+        const [fullYear, mm] = date.split('-').map(Number);
+        const yy = fullYear % 100; // YYYY에서 YY만 가져오기
         const data = new Uint8Array(143);
         data[0] = 0x33;
         data[1] = 0x2B;
